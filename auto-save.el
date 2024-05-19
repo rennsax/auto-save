@@ -108,20 +108,8 @@
   :type 'boolean
   :group 'auto-save)
 
-(defcustom auto-save-delete-trailing-whitespace nil
-  "Delete trailing whitespace when save if this option is non-nil.
-Note, this option is non-nil, will delete all training whitespace execpet current line,
-avoid delete current indent space when you programming."
-  :type 'boolean
-  :group 'auto-save)
-
 (defvar auto-save-disable-predicates
   nil "disable auto save in these case.")
-
-;; Emacs' default auto-save is stupid to generate #foo# files!
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-(setq create-lockfiles nil)
 
 (defun auto-save-buffers ()
   (interactive)
@@ -182,21 +170,6 @@ avoid delete current indent space when you programming."
         (lsp-bridge-remote-save-buffer)
       (basic-save-buffer))))
 
-(defun auto-save-delete-trailing-whitespace-except-current-line ()
-  (interactive)
-  (when auto-save-delete-trailing-whitespace
-    (let ((begin (line-beginning-position))
-          (end (point)))
-      (save-excursion
-        (when (< (point-min) begin)
-          (save-restriction
-            (narrow-to-region (point-min) (1- begin))
-            (delete-trailing-whitespace)))
-        (when (> (point-max) end)
-          (save-restriction
-            (narrow-to-region end (point-max))
-            (delete-trailing-whitespace)))))))
-
 (defvar auto-save-timer nil)
 
 (defun auto-save-set-timer ()
@@ -213,13 +186,11 @@ Cancel any previous timer."
 
 (defun auto-save-enable ()
   (interactive)
-  (auto-save-set-timer)
-  (add-hook 'before-save-hook 'auto-save-delete-trailing-whitespace-except-current-line))
+  (auto-save-set-timer))
 
 (defun auto-save-disable ()
   (interactive)
-  (auto-save-cancel-timer)
-  (remove-hook 'before-save-hook 'auto-save-delete-trailing-whitespace-except-current-line))
+  (auto-save-cancel-timer))
 
 (defun auto-save-is-remote-file ()
   (and (boundp 'lsp-bridge-remote-file-flag)
