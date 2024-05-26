@@ -112,7 +112,6 @@
   nil "disable auto save in these case.")
 
 (defun auto-save-buffers ()
-  (interactive)
   (let ((autosave-buffer-list))
     (ignore-errors
       (save-current-buffer
